@@ -14,9 +14,8 @@ public class FirstSwingExample
 	{
 		FirstSwingExample example = new FirstSwingExample();
 
-		JFrame f = new JFrame();// creating instance of JFrame
-		example.buildContentWithGridBagLayout(f);
-		example.startTimer();
+		JLabel label = example.buildContentWithGridBagLayout();
+		example.startTimer(label);
 	}
 
 	public FirstSwingExample() {
@@ -24,7 +23,7 @@ public class FirstSwingExample
 		soundPlayer = new SoundPlayer(soundPreference);
 	}
 
-	private void startTimer()
+	private void startTimer(JLabel label)
 	{
 		long startTime = System.currentTimeMillis();
 		long wakeInterval = 10000;
@@ -34,7 +33,9 @@ public class FirstSwingExample
 			public void actionPerformed(ActionEvent evt)
 			{
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				System.out.println(String.format("elapsedTime in millis %,d", elapsedTime));
+				String value = String.format("elapsedTime in millis %,d", elapsedTime);
+				System.out.println(value);
+				label.setText(value);
 
 				if (elapsedTime > nextInterval)
 				{
@@ -48,8 +49,10 @@ public class FirstSwingExample
 		timer.start();
 	}
 
-	private void buildContentWithGridBagLayout(JFrame f)
+	private JLabel buildContentWithGridBagLayout()
 	{
+		JFrame f = new JFrame();// creating instance of JFrame
+
 		f.setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -89,7 +92,8 @@ public class FirstSwingExample
 		f.setLocation(-1000, 10);
 		f.setVisible(true);// making the frame visible
 		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
+		
+		return counterLabel;
 	}
 
 	private void buildContentWithNoLayout(JFrame f)
