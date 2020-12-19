@@ -3,19 +3,21 @@ package mywin;
 import java.awt.*; // Using AWT layouts
 import java.awt.event.*; // Using AWT event classes and listener interfaces
 import javax.swing.*; // Using Swing components and containers
+import javax.swing.border.BevelBorder;
 
 public class FirstSwingExample
 {
 	private IPreferenceSound soundPreference;
 	private ISoundPlayer soundPlayer;
 	private long nextInterval;
-
+	private JLabel statusLabel;
+	
 	public static void main(String[] args)
 	{
 		FirstSwingExample example = new FirstSwingExample();
 
 		JFrame f = new JFrame();// creating instance of JFrame
-		example.buildContentWithGridBagLayout(f);
+		example.buildContent(f);
 		example.startTimer();
 	}
 
@@ -34,7 +36,9 @@ public class FirstSwingExample
 			public void actionPerformed(ActionEvent evt)
 			{
 				long elapsedTime = System.currentTimeMillis() - startTime;
-				System.out.println(String.format("elapsedTime in millis %,d", elapsedTime));
+				String message = String.format("elapsedTime in millis %,d", elapsedTime);
+				System.out.println(message);
+				updateStatus(message);
 
 				if (elapsedTime > nextInterval)
 				{
@@ -48,9 +52,34 @@ public class FirstSwingExample
 		timer.start();
 	}
 
-	private void buildContentWithGridBagLayout(JFrame f)
+	private void updateStatus(String text)
 	{
-		f.setLayout(new GridBagLayout());
+		statusLabel.setText(text);
+	}
+	
+	private JLabel createStatusLabel()
+	{
+		JLabel statusLabel = new JLabel("status");
+		statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		return statusLabel;
+	}
+	
+	private void buildContent(JFrame f)
+	{
+		f.setLayout(new BorderLayout());
+		
+		JPanel statusPanel = new JPanel();
+		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		statusPanel.setPreferredSize(new Dimension(f.getWidth(), 24));
+		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+		
+		statusLabel = createStatusLabel();
+		statusPanel.add(statusLabel);
+		
+		f.add(statusPanel, BorderLayout.SOUTH);
+		
+		JPanel mainPanel = new JPanel();	
+		mainPanel.setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -59,7 +88,7 @@ public class FirstSwingExample
 		c.gridx = 0;
 		c.gridy = 0;
 		c.weightx = 0.25;
-		f.add(counterLabel, c);
+		mainPanel.add(counterLabel, c);
 
 		JTextField counterTextField = new JTextField("0");
 		counterTextField.setEditable(true);
@@ -67,7 +96,7 @@ public class FirstSwingExample
 		c.gridx = 1;
 		c.gridy = 0;
 		c.weightx = 0.75;
-		f.add(counterTextField, c);
+		mainPanel.add(counterTextField, c);
 
 		JButton button = new JButton("Play Now");// creating instance of JButton
 		button.addActionListener(buttonAction(counterTextField));
@@ -75,7 +104,7 @@ public class FirstSwingExample
 		c.gridy = 1;
 		c.weightx = 0.5;
 		c.insets = new Insets(3, 0, 3, 13);
-		f.add(button, c);
+		mainPanel.add(button, c);
 
 		PreferencePanel preferencePanel = new PreferencePanel(soundPreference);
 		c.gridx = 0;
@@ -83,7 +112,9 @@ public class FirstSwingExample
 		c.weightx = 1;
 		c.gridwidth = 2;
 		c.insets = new Insets(0, 0, 0, 0);
-		f.add(preferencePanel, c);
+		mainPanel.add(preferencePanel, c);
+
+		f.add(mainPanel, BorderLayout.CENTER);		
 
 		f.setSize(400, 300);// width and height
 		f.setLocation(-1000, 10);
@@ -118,7 +149,6 @@ public class FirstSwingExample
 		PreferencePanel preferencePanel = new PreferencePanel(soundPreference);
 		preferencePanel.setBounds(0, 160, 390, 42);// x axis, y axis, width, height
 		f.add(preferencePanel);
-
 	}
 
 	private ActionListener buttonAction(JTextField counterTextField)
